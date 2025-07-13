@@ -1,0 +1,11 @@
+
+openai
+pyttsx3
+speechrecognition
+pyaudio
+langchain
+youtube-transcript-api
+python-dotenv
+tiktoken
+gTTS
+streamlit
