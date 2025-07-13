@@ -15,14 +15,10 @@ def say(text):
 
 # For Streamlit mode (jarvis_web.py)
 def generate_audio(text):
-    try:
-        tts = gTTS(text)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-            tts.save(fp.name)
-            return fp.name
-    except Exception as e:
-        print(f"[Voice Error] generate_audio failed: {e}")
-        return None
+    tts = gTTS(text)
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+    tts.save(temp_file.name)
+    return temp_file.name
 
 # For both: voice input from mic
 def takeCommand():
