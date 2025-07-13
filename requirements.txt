@@ -1,8 +1,6 @@
 streamlit
-soundfile
-openai
-requests
+gTTS
 pydub
-speechrecognition
-
+openai-whisper
+soundfile
 
