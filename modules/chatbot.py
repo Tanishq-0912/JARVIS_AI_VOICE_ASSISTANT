@@ -1,6 +1,7 @@
 
 import requests
 from config import together_api_key
+import streamlit as st
 
 def query_together(prompt):
     url = "https://api.together.xyz/v1/chat/completions"
