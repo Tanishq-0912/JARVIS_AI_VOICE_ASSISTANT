@@ -3,4 +3,6 @@ gTTS
 pydub
 openai-whisper
 soundfile
-
+audio_recorder_streamlit
+soundfile
+SpeechRecognition
