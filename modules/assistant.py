@@ -3,6 +3,7 @@ import webbrowser
 from modules.chatbot import query_together
 from config import together_api_key
 from modules.voice import takeCommand
+from modules.voice import generate_audio
 
 # Conditional voice support
 if os.environ.get("IS_STREAMLIT"):
@@ -12,6 +13,9 @@ else:
 
 def handle_query(query):
     query = query.lower()
+    response = query_together(query)
+    audio_path = generate_audio(response)
+    return response, audio_path
 
     # ---- Handle Web Commands ----
     if "open google" in query:
