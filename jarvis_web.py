@@ -1,39 +1,46 @@
-import os
 import streamlit as st
+import tempfile
+import soundfile as sf
+from audio_recorder_streamlit import audio_recorder
 from modules.assistant import handle_query
-from modules.voice import takeCommand
+import speech_recognition as sr
 
-os.environ["IS_STREAMLIT"] = "1"
+st.set_page_config(page_title="Jarvis AI Assistant", layout="centered")
+st.title("🤖 Jarvis - Your AI Voice Assistant")
 
-st.set_page_config(page_title="Jarvis AI")
-st.title("🤖 Jarvis - Your AI Assistant")
+# Text input option
+st.markdown("### 💬 Type your message")
+user_input = st.text_input("You:", "")
 
-st.markdown("Ask something by typing or using your voice 🎤")
+if user_input:
+    response, audio_path = handle_query(user_input)
+    st.success(response)
+    if audio_path:
+        st.audio(audio_path, format="audio/wav")
 
-# Text input
-user_input = st.text_input("Type your question:")
+# Voice input option
+st.markdown("---")
+st.markdown("### 🎤 Talk to Jarvis using your voice")
+audio_bytes = audio_recorder(pause_threshold=1.0)
 
-# Voice input
-use_mic = st.button("🎤 Speak Instead")
+if audio_bytes:
+    st.audio(audio_bytes, format='audio/wav')
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
+        f.write(audio_bytes)
+        temp_audio_path = f.name
 
-# Processing input
-if st.button("Ask") or use_mic:
-    if use_mic:
-        st.info("Listening for your voice input...")
+    # Speech recognition
+    recognizer = sr.Recognizer()
+    with sr.AudioFile(temp_audio_path) as source:
+        audio_data = recognizer.record(source)
         try:
-            user_input = takeCommand()
-            st.success(f"Recognized: {user_input}")
-        except Exception as e:
-            st.error(f"Mic error: {e}")
-            user_input = ""
-
-    if user_input:
-        st.write("Thinking...")
-        response, audio_path = handle_query(user_input)
-        st.success(response)
-
-        # Play audio
-        if audio_path:
-            st.audio(audio_path, format="audio/mp3")
-    else:
-        st.warning("Please type or speak something.")
+            voice_text = recognizer.recognize_google(audio_data)
+            st.markdown(f"**You said:** {voice_text}")
+            response, audio_path = handle_query(voice_text)
+            st.success(response)
+            if audio_path:
+                st.audio(audio_path, format="audio/wav")
+        except sr.UnknownValueError:
+            st.error("Sorry, I couldn't understand what you said.")
+        except sr.RequestError:
+            st.error("Speech Recognition service is unavailable. Please try again.")
